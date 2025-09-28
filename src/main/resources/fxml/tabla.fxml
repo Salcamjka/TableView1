@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Importaciones de componentes JavaFX necesarios -->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    Contenedor principal: VBox
+    - maxHeight="-Infinity" y minWidth="-Infinity": tamaño fijo (no se redimensiona)
+    - prefHeight="400.0" y prefWidth="600.0": dimensiones iniciales de la ventana
+    - spacing="10.0": espacio vertical entre los elementos hijos
+-->
+<VBox
+        maxHeight="-Infinity"
+        maxWidth="-Infinity"
+        minHeight="-Infinity"
+        minWidth="-Infinity"
+        prefHeight="400.0"
+        prefWidth="600.0"
+        spacing="10.0"
+        xmlns="http://javafx.com/javafx/24.0.1"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="salca_bachir.controladores.VisualizaCliente">
+
+    <children>
+        <!--
+            GridPane para organizar los campos de entrada en una cuadrícula de 2 columnas x 3 filas
+            - hgap="10.0": espacio horizontal entre columnas
+            - vgap="10.0": espacio vertical entre filas
+        -->
+        <GridPane hgap="10.0" vgap="10.0">
+            <!-- Definición de columnas -->
+            <columnConstraints>
+                <!-- Primera columna: ancho preferido 100px, crece si hay espacio -->
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <!-- Segunda columna: igual que la primera -->
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            </columnConstraints>
+
+            <!-- Definición de filas -->
+            <rowConstraints>
+                <!-- Fila 1: altura preferida 30px -->
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <!-- Fila 2: igual -->
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <!-- Fila 3: igual -->
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+
+            <children>
+                <!-- Fila 1: Nombre + Campo + Botón "Add" -->
+                <HBox spacing="10.0">
+                    <children>
+                        <Label text="Nombre:" />
+                        <TextField fx:id="firstNameField" />
+                        <!-- Botón "Add" vinculado al método handleAdd() del controlador -->
+                        <Button text="Add" onAction="#handleAdd" />
+                    </children>
+                </HBox>
+
+                <!-- Fila 2: Apellido (GridPane.rowIndex="1" indica la segunda fila) -->
+                <HBox spacing="10.0" GridPane.rowIndex="1">
+                    <children>
+                        <Label text="Apellido:" />
+                        <TextField fx:id="lastNameField" />
+                    </children>
+                </HBox>
+
+                <!-- Fila 3: Fecha de nacimiento -->
+                <HBox spacing="10.0" GridPane.rowIndex="2">
+                    <children>
+                        <Label text="Fecha de nacimiento:" />
+                        <DatePicker fx:id="birthDateField" />
+                    </children>
+                </HBox>
+            </children>
+        </GridPane>
+
+        <!--
+            Contenedor para los botones de acción
+            - spacing="10.0": espacio entre botones
+        -->
+        <HBox spacing="10.0">
+            <children>
+                <!-- Botón "Restore Rows" → restaura datos originales -->
+                <Button text="Restaurar Filas" onAction="#handleRestore" />
+                <!-- Botón "Delete Selected Rows" → elimina filas seleccionadas -->
+
+                <Button text="Eliminar Filas Seleccionadas" onAction="#handleDeleteSelected" />
+            </children>
+        </HBox>
+
+        <!--
+            TABLA PRINCIPAL
+            - prefHeight="200.0": altura fija de 200px → ¡CLAVE PARA EVITAR SCROLL!
+            - prefWidth="200.0": ancho inicial (se ajustará al contenido real)
+            - Las columnas tienen anchos prefijados para evitar redimensionamiento automático
+            - El scroll vertical NO aparecerá porque la altura es fija y limitada
+        -->
+        <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0">
+            <columns>
+                <!-- Columna "Id": ancho fijo de 50px -->
+                <TableColumn fx:id="idColumn" prefWidth="50.0" text="Id" />
+                <!-- Columna "Nombre": ancho fijo de 150px -->
+                <TableColumn fx:id="firstNameColumn" prefWidth="150.0" text="Nombre" />
+                <!-- Columna "Apellido": ancho fijo de 150px -->
+                <TableColumn fx:id="lastNameColumn" prefWidth="150.0" text="Apellido" />
+                <!-- Columna "Fecha Nac.": ancho fijo de 150px -->
+                <TableColumn fx:id="birthDateColumn" prefWidth="150.0" text="Fecha Nac." />
+            </columns>
+        </TableView>
+    </children>
+</VBox>
