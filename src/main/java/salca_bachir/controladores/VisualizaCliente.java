@@ -20,7 +20,7 @@ public class VisualizaCliente {
     @FXML private TableColumn<Persona, String> lastNameColumn;
     @FXML private TableColumn<Persona, LocalDate> birthDateColumn;
 
-    // 🔥 LISTA OBSERVABLE COMO CAMPO DE LA CLASE (clave para que "Add" funcione)
+    // LISTA OBSERVABLE COMO CAMPO DE LA CLASE (clave para que "Add" funcione)
     private ObservableList<Persona> personas = FXCollections.observableArrayList();
     private ObservableList<Persona> originalData;
     private int nextId = 6;

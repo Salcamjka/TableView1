@@ -15,6 +15,8 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        stage.setResizable(false);//PARA QUE NO
+
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/fxml/tabla.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         scene.getStylesheets().add(App.class.getResource("/css/style.css").toExternalForm());
@@ -22,6 +24,7 @@ public class App extends Application {
         stage.setScene(scene);
         stage.show();
         LOGGER.info("Aplicación iniciada");
+
     }
 
     public static void main(String[] args) {

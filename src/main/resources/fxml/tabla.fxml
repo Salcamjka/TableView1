@@ -56,6 +56,7 @@
                         <TextField fx:id="firstNameField" />
                         <!-- Botón "Add" vinculado al método handleAdd() del controlador -->
                         <Button text="Add" onAction="#handleAdd" />
+
                     </children>
                 </HBox>
 

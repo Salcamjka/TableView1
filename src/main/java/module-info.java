@@ -7,6 +7,7 @@ module salca_bachir {
     //  ¡ESTO ES CLAVE! Abre el paquete del controlador
     opens salca_bachir.controladores to javafx.fxml;
     opens salca_bachir to javafx.fxml;
+    opens salca_bachir.modelos to javafx.base, javafx.fxml;
 
     exports salca_bachir;
 }
