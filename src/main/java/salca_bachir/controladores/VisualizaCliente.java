@@ -1,108 +1,156 @@
 package salca_bachir.controladores;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import salca_bachir.dao.PersonasDao;
+import salca_bachir.modelos.Persona;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import salca_bachir.modelos.Persona;
+import javafx.collections.ObservableList;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
+/**
+ * Controlador de la vista tabla.fxml.
+ * Gestiona la interacción entre la interfaz gráfica y la lógica de negocio (DAO).
+ */
 public class VisualizaCliente {
 
-    @FXML private TextField firstNameField;
-    @FXML private TextField lastNameField;
-    @FXML private DatePicker birthDateField;
-    @FXML private TableView<Persona> tableView;
-    @FXML private TableColumn<Persona, Integer> idColumn;
-    @FXML private TableColumn<Persona, String> firstNameColumn;
-    @FXML private TableColumn<Persona, String> lastNameColumn;
-    @FXML private TableColumn<Persona, LocalDate> birthDateColumn;
+    // Referencias a los componentes del FXML
+    @FXML
+    private TextField firstNameField;
 
-    // LISTA OBSERVABLE COMO CAMPO DE LA CLASE (clave para que "Add" funcione)
-    private ObservableList<Persona> personas = FXCollections.observableArrayList();
-    private ObservableList<Persona> originalData;
-    private int nextId = 6;
+    @FXML
+    private TextField lastNameField;
 
+    @FXML
+    private DatePicker birthDateField;
+
+    @FXML
+    private TableView<Persona> tableView;
+
+    @FXML
+    private TableColumn<Persona, Integer> idColumn;
+
+    @FXML
+    private TableColumn<Persona, String> firstNameColumn;
+
+    @FXML
+    private TableColumn<Persona, String> lastNameColumn;
+
+    @FXML
+    private TableColumn<Persona, LocalDate> birthDateColumn;
+
+    // Instancia del DAO para operaciones con la base de datos
+    private final PersonasDao dao = new PersonasDao();
+
+    /**
+     * Método llamado automáticamente al cargar el FXML.
+     * Configura las columnas de la tabla y carga los datos iniciales desde la base de datos.
+     */
     @FXML
     public void initialize() {
-        // Vincular columnas con propiedades de Persona
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        firstNameColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-        lastNameColumn.setCellValueFactory(new PropertyValueFactory<>("apellido"));
-        birthDateColumn.setCellValueFactory(new PropertyValueFactory<>("fechaNacimiento"));
+        // Enlazar columnas con las propiedades del modelo Persona
+        idColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
+        firstNameColumn.setCellValueFactory(cellData -> cellData.getValue().nombreProperty());
+        lastNameColumn.setCellValueFactory(cellData -> cellData.getValue().apellidoProperty());
+        birthDateColumn.setCellValueFactory(cellData -> cellData.getValue().fechaNacimientoProperty());
 
-        // Formatear fecha en la columna
-        birthDateColumn.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(LocalDate date, boolean empty) {
-                super.updateItem(date, empty);
-                setText(empty || date == null ? "" : date.format(DateTimeFormatter.ISO_LOCAL_DATE));
-            }
-        });
-
-        // Asignar la lista observable a la tabla
-        tableView.setItems(personas);
-
-        // Cargar datos iniciales
-        loadInitialData();
+        // Cargar datos desde la base de datos
+        tableView.setItems(dao.getAllPersonas());
     }
 
-    private void loadInitialData() {
-        personas.setAll(
-                new Persona(1, "Ashwin", "Sharan", LocalDate.of(2012, 10, 11)),
-                new Persona(2, "Advik", "Sharan", LocalDate.of(2012, 10, 11)),
-                new Persona(3, "Layne", "Estes", LocalDate.of(2011, 12, 16)),
-                new Persona(4, "Mason", "Boyd", LocalDate.of(2003, 4, 20)),
-                new Persona(5, "Babalu", "Sharan", LocalDate.of(1980, 1, 10))
-        );
-        originalData = FXCollections.observableArrayList(personas);
-    }
-
+    /**
+     * Maneja el evento del botón "Add" y del menú "Editar → Agregar".
+     * Valida los campos, crea una nueva persona y la guarda en la base de datos.
+     */
     @FXML
     private void handleAdd() {
-        String nombre = firstNameField.getText().trim();
-        String apellido = lastNameField.getText().trim();
-        LocalDate fecha = birthDateField.getValue();
+        String nombre = firstNameField.getText();
+        String apellido = lastNameField.getText();
+        LocalDate fechaNac = birthDateField.getValue();
 
-        if (nombre.isEmpty() || apellido.isEmpty() || fecha == null) {
-            showAlert("Error", "Todos los campos son obligatorios.");
+        if (nombre == null || nombre.trim().isEmpty() ||
+                apellido == null || apellido.trim().isEmpty() ||
+                fechaNac == null) {
+            showAlert(Alert.AlertType.WARNING, "Campos incompletos", "Por favor, completa todos los campos.");
             return;
         }
 
-        // 🔥 AÑADIR A LA LISTA OBSERVABLE (no a tableView.getItems())
-        personas.add(new Persona(nextId++, nombre, apellido, fecha));
-        clearFields();
-    }
+        // Crear nueva persona (el ID será asignado por la base de datos)
+        Persona nueva = new Persona(0, nombre, apellido, fechaNac);
+        dao.addPersona(nueva);
 
-    @FXML
-    private void handleDeleteSelected() {
-        var selected = tableView.getSelectionModel().getSelectedItems();
-        if (selected.isEmpty()) {
-            showAlert("Info", "Selecciona al menos una fila.");
-            return;
-        }
-        personas.removeAll(selected);
-    }
+        // Actualizar la vista
+        tableView.getItems().add(nueva);
 
-    @FXML
-    private void handleRestore() {
-        personas.setAll(originalData);
-        nextId = originalData.size() + 1;
-    }
-
-    private void clearFields() {
+        // Limpiar campos
         firstNameField.clear();
         lastNameField.clear();
         birthDateField.setValue(null);
     }
 
-    private void showAlert(String title, String msg) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
+    /**
+     * Maneja el evento del botón "Eliminar Filas Seleccionadas" y del menú "Editar → Eliminar Seleccionado".
+     * Elimina la fila seleccionada de la base de datos y de la tabla.
+     */
+    @FXML
+    private void handleDeleteSelected() {
+        Persona selected = tableView.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            dao.deletePersona(selected.getId());
+            tableView.getItems().remove(selected);
+        } else {
+            showAlert(Alert.AlertType.INFORMATION, "Ninguna selección", "Selecciona una fila para eliminar.");
+        }
+    }
+
+    /**
+     * Maneja el evento del botón "Restaurar Filas" y del menú "Editar → Restaurar Filas".
+     * Recarga todos los datos desde la base de datos.
+     */
+    @FXML
+    private void handleRestore() {
+        tableView.setItems(dao.getAllPersonas());
+    }
+
+    /**
+     * Maneja el evento del menú "Archivo → Salir".
+     */
+    @FXML
+    private void handleExit() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Salir");
+        alert.setHeaderText("¿Estás seguro de que deseas salir?");
+        alert.setContentText("Todos los cambios no guardados se perderán.");
+
+        if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+            javafx.application.Platform.exit();
+        }
+    }
+
+    /**
+     * Maneja el evento del menú "Ayuda → Acerca de...".
+     */
+    @FXML
+    private void handleAbout() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Acerca de");
+        alert.setHeaderText("Tabla de Clientes - Versión 1.0");
+        alert.setContentText(
+                "Aplicación de gestión de personas.\n" +
+                        "Conectada a MariaDB vía Docker.\n" +
+                        "Desarrollado por: SALCA BACHIR SALEH D\n" +
+                        "© 2025"
+        );
+        alert.showAndWait();
+    }
+
+    /**
+     * Muestra un cuadro de diálogo de alerta.
+     */
+    private void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);
-        alert.setContentText(msg);
+        alert.setContentText(message);
         alert.showAndWait();
     }
 }

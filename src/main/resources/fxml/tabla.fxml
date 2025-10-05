@@ -11,6 +11,7 @@
     - prefHeight="400.0" y prefWidth="600.0": dimensiones iniciales de la ventana
     - spacing="10.0": espacio vertical entre los elementos hijos
 -->
+
 <VBox
         maxHeight="-Infinity"
         maxWidth="-Infinity"
@@ -24,6 +25,34 @@
         fx:controller="salca_bachir.controladores.VisualizaCliente">
 
     <children>
+
+        <!-- BARRA DE MENÚ -->
+        <MenuBar>
+            <menus>
+                <!-- MENÚ ARCHIVO -->
+                <Menu text="Archivo">
+                    <items>
+                        <MenuItem text="Salir" onAction="#handleExit" />
+                    </items>
+                </Menu>
+
+                <!-- MENÚ EDITAR -->
+                <Menu text="Editar">
+                    <items>
+                        <MenuItem text="Agregar" onAction="#handleAdd" />
+                        <MenuItem text="Eliminar Seleccionado" onAction="#handleDeleteSelected" />
+                        <MenuItem text="Restaurar Filas" onAction="#handleRestore" />
+                    </items>
+                </Menu>
+
+                <!-- MENÚ AYUDA -->
+                <Menu text="Ayuda">
+                    <items>
+                        <MenuItem text="Acerca de..." onAction="#handleAbout" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
         <!--
             GridPane para organizar los campos de entrada en una cuadrícula de 2 columnas x 3 filas
             - hgap="10.0": espacio horizontal entre columnas
@@ -85,7 +114,7 @@
         <HBox spacing="10.0">
             <children>
                 <!-- Botón "Restore Rows" → restaura datos originales -->
-                <Button text="Restaurar Filas" onAction="#handleRestore" />
+                <Button  text="Restaurar Filas" onAction="#handleRestore" />
                 <!-- Botón "Delete Selected Rows" → elimina filas seleccionadas -->
 
                 <Button text="Eliminar Filas Seleccionadas" onAction="#handleDeleteSelected" />

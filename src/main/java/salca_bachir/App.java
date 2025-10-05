@@ -6,10 +6,17 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class App extends Application {
+    ResourceBundle bundle = ResourceBundle.getBundle("textos", Locale.getDefault());
+
+    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/tabla.fxml"), bundle);
+
 
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
